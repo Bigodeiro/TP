@@ -22,7 +22,7 @@ void printaChar(int n, char c)
     for (int i = 0; i < n; i++) printf("%c", c);
 }
 
-void printaNonograma(char **mat, coord matSize, coord maxOffset)
+void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçalho, int **yCabeçalho)
 {
     //LogicaPrintaNonograma.png
     //Parte 1
@@ -70,12 +70,27 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset)
     }
 }
 
+void* alocMat(int y, int x, int typeSize)
+{
+    int** mat = NULL;
+
+    mat = malloc(y * sizeof(void*));
+    
+    for (int i = 0; i < y; i++)
+    {
+        mat[i] = malloc(x * typeSize);
+    }
+
+    return mat;
+}
+
 int main()
 {
     coord maxOffset = {0, 0};
     coord matSize;
     int **xCabeçalho;
     int **yCabeçalho;
+    char** mat;
 
     FILE *arqNonograma = fopen("nonograma.txt", "r");
     fscanf(arqNonograma, "%d %d", &matSize.y, &matSize.x);
@@ -87,11 +102,12 @@ int main()
     {
         int aux;
         fscanf(arqNonograma, "%d", &aux);
-        yCabeçalho[i] = malloc(aux * sizeof(int));
+        yCabeçalho[i] = malloc((aux + 1) * sizeof(int));
+        yCabeçalho[i][0] = aux;
 
         for (int j = 0; j < aux; j++)
         {
-            fscanf(arqNonograma, "%d", &yCabeçalho[i][j]);
+            fscanf(arqNonograma, "%d", &yCabeçalho[i][j+1]);
         }
 
         maxOffset.y = aux > maxOffset.y ? aux : maxOffset.y;
@@ -100,39 +116,40 @@ int main()
     {
         int aux;
         fscanf(arqNonograma, "%d", &aux);
-        xCabeçalho[i] = malloc(aux * sizeof(int));
+        xCabeçalho[i] = malloc((aux + 1) * sizeof(int));
+        xCabeçalho[i][0] = aux;
 
         for (int j = 0; j < aux; j++)
         {
-            fscanf(arqNonograma, "%d", &xCabeçalho[i][j]);
+            fscanf(arqNonograma, "%d", &xCabeçalho[i][j+1]);
         }
 
         maxOffset.x = aux > maxOffset.x ? aux : maxOffset.x;
     }
 
-    //Cria e preenche o nonograma
-    char **mat = malloc(matSize.y * sizeof(char*));
+    mat = alocMat(matSize.y, matSize.x, sizeof(char));
+
     for (int i = 0; i < matSize.y; i++)
     {
-        mat[i] = malloc(matSize.x * sizeof(char));
         for (int j = 0; j < matSize.x; j++)
         {
             char aux;
+
             fscanf(arqNonograma, "%c", &aux);
 
-            if (aux != '\n' && aux != ' ')
-            {
-                mat[i][j] = aux - '0';
-            }
-            else
+            if (aux == '\n' || aux == ' ')
             {
                 j--;
-            } 
+                continue;
+            }
+
+            mat[i][j] = aux;
         }
     }
 
-    printaNonograma(mat, matSize, maxOffset);
+    printaNonograma(mat, matSize, maxOffset, xCabeçalho, yCabeçalho);
 
 
+    fclose(arqNonograma);
     return 0;
 }
