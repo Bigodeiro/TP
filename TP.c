@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CINZA  0
-#define PRETO  1
-#define BRANCO 2
-
 typedef struct
 {
     int x;
@@ -22,10 +18,24 @@ void printaChar(int n, char c)
     for (int i = 0; i < n; i++) printf("%c", c);
 }
 
+void* alocMat(int y, int x, int typeSize)
+{
+    int** mat = NULL;
+
+    mat = malloc(y * sizeof(void*));
+    
+    for (int i = 0; i < y; i++)
+    {
+        mat[i] = malloc(x * typeSize);
+    }
+
+    return mat;
+}
+
 void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçalho, int **yCabeçalho)
 {
     //LogicaPrintaNonograma.png
-    //Parte 1
+    //!Parte 1
     for (int i = 0; i < maxOffset.y; i++)
     {
         printaChar((maxOffset.x + 1) * 2, ' ');
@@ -43,7 +53,7 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
         printf("\n");
     }
 
-    //Parte 2
+    //!Parte 2
     printaChar((maxOffset.y + 1) * 2, ' ');
 
     for (int i = 0; i < matSize.x; i++)
@@ -54,7 +64,7 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
     }
     printf("\n");
     
-    //Parte 3
+    //!Parte 3
     for (int i = 0; i < matSize.y; i++)
     {
         for (int j = 0; j < maxOffset.x; j++)
@@ -78,34 +88,58 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
     }
 }
 
-void* alocMat(int y, int x, int typeSize)
+char interpretaInput(char *str)
 {
-    int** mat = NULL;
+    if (strcmp(str, "x"       ) == 0) return 'v';
+    if (strcmp(str, "-"       ) == 0) return 'v';
+    if (strcmp(str, "."       ) == 0) return 'v';
+    if (strcmp(str, "resolver") == 0) return 'r';
+    if (strcmp(str, "sair"    ) == 0) return 'q';
+    if (strcmp(str, "salvar"  ) == 0) return 's';
+    if (strcmp(str, "comandos") == 0) return 'c';
 
-    mat = malloc(y * sizeof(void*));
-    
-    for (int i = 0; i < y; i++)
-    {
-        mat[i] = malloc(x * typeSize);
+    return -1;
+}
+
+void alteraNonograma(char **mat, coord matSize, coord pos, char c)
+{
+    if (pos.x < 0 || pos.x >= matSize.x || pos.y < 0 || pos.y >= matSize.y) {
+        printf("Coordenada inválida\n");
+        return;
     }
 
-    return mat;
+    mat[pos.y][pos.x] = c;
 }
 
 int main()
 {
+    printf("Bem vindo ao Nonograma!\n\n");
+    printf("Comandos:\n");
+    printf("x <x> <y> - Marca a casa (x, y) com um X\n");
+    printf("- <x> <y> - Marca a casa (x, y) com um -\n");
+    printf(". <x> <y> - Marca a casa (x, y) com um .\n");
+    printf("resolver  - Resolve o nonograma\n");
+    printf("salvar    - Salva o nonograma\n");
+    printf("sair      - Sai do programa\n\n\n");
+
+    //? Criação de variáveis
     coord maxOffset = {0, 0};
     coord matSize;
     int **xCabeçalho;
     int **yCabeçalho;
+    int continuar = 1;
     char** mat;
+    char input[10];
 
+    //? Leitura de arquivo
     FILE *arqNonograma = fopen("nonograma.txt", "r");
     fscanf(arqNonograma, "%d %d", &matSize.y, &matSize.x);
 
+    //? Alocação dos cabeçalhos
     xCabeçalho = malloc(matSize.x * sizeof(int*));
     yCabeçalho = malloc(matSize.y * sizeof(int*));
 
+    //? Ler cabeçalho y
     for (int i = 0; i < matSize.y; i++)
     {
         int aux;
@@ -120,6 +154,8 @@ int main()
 
         maxOffset.y = aux > maxOffset.y ? aux : maxOffset.y;
     }
+
+    //? Ler cabeçalho x
     for (int i = 0; i < matSize.x; i++)
     {
         int aux;
@@ -135,8 +171,8 @@ int main()
         maxOffset.x = aux > maxOffset.x ? aux : maxOffset.x;
     }
 
+    //? Ler e alocar matriz nonograma
     mat = alocMat(matSize.y, matSize.x, sizeof(char));
-
     for (int i = 0; i < matSize.y; i++)
     {
         for (int j = 0; j < matSize.x; j++)
@@ -155,9 +191,70 @@ int main()
         }
     }
 
-    printaNonograma(mat, matSize, maxOffset, xCabeçalho, yCabeçalho);
+    //! Código a ser executado em loop
+    while (continuar)
+    {
+        int x, y;
+        printaNonograma(mat, matSize, maxOffset, xCabeçalho, yCabeçalho);
+        printf("\nDigite um comando: ");
+        scanf("%s", input);
 
+        switch (interpretaInput(input))
+        {
+        case 'v':
+            scanf("%d %d", &x, &y);
+            alteraNonograma(mat, matSize, (coord){x, y}, input[0]);
+            break;
 
+        case 'r':
+            printf("Resolver\n");
+            break;
+
+        case 'q':
+            printf("Sair\n");
+            continuar = 0;
+            break;
+
+        case 's':
+            printf("Salvar\n");
+            break;
+        
+        case 'c':
+            printf("Comandos:\n");
+            printf("x <x> <y> - Marca a casa (x, y) com um X\n");
+            printf("- <x> <y> - Marca a casa (x, y) com um -\n");
+            printf(". <x> <y> - Marca a casa (x, y) com um .\n");
+            printf("resolver  - Resolve o nonograma\n");
+            printf("salvar    - Salva o nonograma\n\n");
+            printf("sair      - Sai do programa\n");
+            break;
+
+        default:
+            printf("Comando inválido!\n");
+            break;
+
+        }
+        printaChar(19, '\n');
+    }
+
+    //? Liberação de memória
+    for (int i = 0; i < matSize.y; i++)
+    {
+        free(mat[i]);
+    }
+    free(mat);
+    for (int i = 0; i < matSize.x; i++)
+    {
+        free(xCabeçalho[i]);
+    }
+    free(xCabeçalho);
+    for (int i = 0; i < matSize.y; i++)
+    {
+        free(yCabeçalho[i]);
+    }
+    free(yCabeçalho);
     fclose(arqNonograma);
+
+
     return 0;
 }
