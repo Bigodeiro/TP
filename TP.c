@@ -33,7 +33,11 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
 
         for (int j = 0; j < matSize.x; j++)
         {
-            printaChar(1, 'C');
+            if (xCabeçalho[j][0] > maxOffset.y - i - 1)
+            {
+                printf("%d", xCabeçalho[j][xCabeçalho[j][0] - maxOffset.y + i + 1]);
+            }else printaChar(1, ' ');
+
             printaChar(1, ' ');
         }
         printf("\n");
@@ -55,7 +59,11 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
     {
         for (int j = 0; j < maxOffset.x; j++)
         {
-            printaChar(1, 'C');
+            if (yCabeçalho[i][0] > maxOffset.x - j - 1)
+            {
+                printf("%d", yCabeçalho[i][yCabeçalho[i][0] - maxOffset.x + j + 1]);
+            }else
+                printaChar(1, ' ');
             printaChar(1, ' ');
         }
 
