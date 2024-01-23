@@ -36,17 +36,19 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
 {
     //LogicaPrintaNonograma.png
     //!Parte 1
+    printf("offset vertical: %d\n", maxOffset.y);
+    printf("offset horizontal: %d\n", maxOffset.x);
+
     for (int i = 0; i < maxOffset.y; i++)
     {
-        printaChar((maxOffset.x + 1) * 2, ' ');
-
+        printaChar((maxOffset.x * 3) + 1, ' ');
 
         for (int j = 0; j < matSize.x; j++)
         {
-            if (xCabeçalho[j][0] > maxOffset.y - i - 1)
+            if (yCabeçalho[j][0] > maxOffset.y - i - 1)
             {
-                printf("%d", xCabeçalho[j][xCabeçalho[j][0] - maxOffset.y + i + 1]);
-            }else printaChar(1, ' ');
+                printf("%2d", yCabeçalho[j][yCabeçalho[j][0] - maxOffset.y + i + 1]);
+            }else printaChar(2, ' ');
 
             printaChar(1, ' ');
         }
@@ -54,36 +56,34 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
     }
 
     //!Parte 2
-    printaChar((maxOffset.y + 1) * 2, ' ');
+    printaChar((maxOffset.x * 3) + 2, ' ');
 
     for (int i = 0; i < matSize.x; i++)
     {
         printaChar(1, int2letra(i));
-        printaChar(1, ' ');
+        printaChar(2, ' ');
 
     }
     printf("\n");
-    
+
     //!Parte 3
     for (int i = 0; i < matSize.y; i++)
     {
-        for (int j = 0; j < maxOffset.x; j++)
+        printaChar((maxOffset.x - xCabeçalho[i][0]) * 3, ' ');
+
+        for (int j = 0; j < xCabeçalho[i][0]; j++)
         {
-            if (yCabeçalho[i][0] > maxOffset.x - j - 1)
-            {
-                printf("%d", yCabeçalho[i][yCabeçalho[i][0] - maxOffset.x + j + 1]);
-            }else
-                printaChar(1, ' ');
-            printaChar(1, ' ');
+            printf("%2d ", xCabeçalho[i][j+1]);
         }
+
 
         printaChar(1, int2letra(i));
-
+        
         for (int j = 0; j < matSize.x; j++)
         {
-            printf(" %c", mat[i][j]);
+            
+            printf(" %c ", mat[i][j]);
         }
-    
         printf("\n");
     }
 }
@@ -111,7 +111,7 @@ void alteraNonograma(char **mat, coord matSize, coord pos, char c)
     mat[pos.y][pos.x] = c;
 }
 
-int main()
+int main (int argc, char *argv[])
 {
     printf("Bem vindo ao Nonograma!\n\n");
     printf("Comandos:\n");
@@ -123,6 +123,8 @@ int main()
     printf("sair      - Sai do programa\n\n\n");
 
     //? Criação de variáveis
+    char path[260];
+    strcpy(path, argv[1]);
     coord maxOffset = {0, 0};
     coord matSize;
     int **xCabeçalho;
@@ -132,31 +134,15 @@ int main()
     char input[10];
 
     //? Leitura de arquivo
-    FILE *arqNonograma = fopen("nonograma.txt", "r");
+    FILE *arqNonograma = fopen(path, "r");
     fscanf(arqNonograma, "%d %d", &matSize.y, &matSize.x);
 
     //? Alocação dos cabeçalhos
-    xCabeçalho = malloc(matSize.x * sizeof(int*));
-    yCabeçalho = malloc(matSize.y * sizeof(int*));
-
-    //? Ler cabeçalho y
-    for (int i = 0; i < matSize.y; i++)
-    {
-        int aux;
-        fscanf(arqNonograma, "%d", &aux);
-        yCabeçalho[i] = malloc((aux + 1) * sizeof(int));
-        yCabeçalho[i][0] = aux;
-
-        for (int j = 0; j < aux; j++)
-        {
-            fscanf(arqNonograma, "%d", &yCabeçalho[i][j+1]);
-        }
-
-        maxOffset.y = aux > maxOffset.y ? aux : maxOffset.y;
-    }
+    xCabeçalho = malloc(matSize.y * sizeof(int*));
+    yCabeçalho = malloc(matSize.x * sizeof(int*));
 
     //? Ler cabeçalho x
-    for (int i = 0; i < matSize.x; i++)
+    for (int i = 0; i < matSize.y; i++)
     {
         int aux;
         fscanf(arqNonograma, "%d", &aux);
@@ -171,7 +157,25 @@ int main()
         maxOffset.x = aux > maxOffset.x ? aux : maxOffset.x;
     }
 
+    //? Ler cabeçalho y
+    for (int i = 0; i < matSize.x; i++)
+    {
+        int aux;
+        fscanf(arqNonograma, "%d", &aux);
+        yCabeçalho[i] = malloc((aux + 1) * sizeof(int));
+        yCabeçalho[i][0] = aux;
+
+        for (int j = 0; j < aux; j++)
+        {
+            fscanf(arqNonograma, "%d", &yCabeçalho[i][j+1]);
+        }
+
+        maxOffset.y = aux > maxOffset.y ? aux : maxOffset.y;
+    }
+
     //? Ler e alocar matriz nonograma
+
+
     mat = alocMat(matSize.y, matSize.x, sizeof(char));
     for (int i = 0; i < matSize.y; i++)
     {
@@ -237,18 +241,20 @@ int main()
         printaChar(19, '\n');
     }
 
+
+
     //? Liberação de memória
     for (int i = 0; i < matSize.y; i++)
     {
         free(mat[i]);
     }
     free(mat);
-    for (int i = 0; i < matSize.x; i++)
+    for (int i = 0; i < matSize.y; i++)
     {
         free(xCabeçalho[i]);
     }
     free(xCabeçalho);
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < matSize.x; i++)
     {
         free(yCabeçalho[i]);
     }
