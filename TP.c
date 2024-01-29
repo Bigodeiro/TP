@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio_ext.h>
 
 typedef struct
 {
@@ -11,6 +12,22 @@ typedef struct
 char int2letra(int n) // 0 -> A, 1 -> B, ...
 {
     return n + 'A';
+}
+
+int letra2int(int n) // A -> 0, B -> 1, ...
+{
+    return n - 'A';
+}
+
+void printaComandos ()
+{
+    printf("Comandos:\n");
+    printf("x <x><y> - Marca a casa (x, y) com um X\n");
+    printf("- <x><y> - Marca a casa (x, y) com um -\n");
+    printf(". <x><y> - Marca a casa (x, y) com um .\n");
+    printf("resolver  - Resolve o nonograma\n");
+    printf("salvar    - Salva o nonograma\n\n");
+    printf("sair      - Sai do programa\n");
 }
 
 void printaChar(int n, char c)
@@ -36,9 +53,6 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabeçal
 {
     //LogicaPrintaNonograma.png
     //!Parte 1
-    printf("offset vertical: %d\n", maxOffset.y);
-    printf("offset horizontal: %d\n", maxOffset.x);
-
     for (int i = 0; i < maxOffset.y; i++)
     {
         printaChar((maxOffset.x * 3) + 1, ' ');
@@ -101,26 +115,60 @@ char interpretaInput(char *str)
     return -1;
 }
 
-void alteraNonograma(char **mat, coord matSize, coord pos, char c)
+int alteraNonograma(char **mat, coord matSize, coord pos, char c)
 {
     if (pos.x < 0 || pos.x >= matSize.x || pos.y < 0 || pos.y >= matSize.y) {
-        printf("Coordenada inválida\n");
-        return;
+        return 2;
     }
 
     mat[pos.y][pos.x] = c;
+    return 0;
+}
+
+void salvaArquivo(char *path, char **mat, coord matSize, int **xCabeçalho, int **yCabeçalho)
+{
+    FILE *arqNonograma = fopen(path, "w");
+
+    fprintf(arqNonograma, "%d %d\n", matSize.y, matSize.x);
+
+    for (int i = 0; i < matSize.y; i++)
+    {
+        fprintf(arqNonograma, "%d ", xCabeçalho[i][0]);
+
+        for (int j = 0; j < xCabeçalho[i][0]; j++)
+        {
+            fprintf(arqNonograma, "%d ", xCabeçalho[i][j+1]);
+        }
+        fprintf(arqNonograma, "\n");
+    }
+
+    for (int i = 0; i < matSize.x; i++)
+    {
+        fprintf(arqNonograma, "%d ", yCabeçalho[i][0]);
+
+        for (int j = 0; j < yCabeçalho[i][0]; j++)
+        {
+            fprintf(arqNonograma, "%d ", yCabeçalho[i][j+1]);
+        }
+        fprintf(arqNonograma, "\n");
+    }
+
+    for (int i = 0; i < matSize.y; i++)
+    {
+        for (int j = 0; j < matSize.x; j++)
+        {
+            fprintf(arqNonograma, "%c", mat[i][j]);
+        }
+        fprintf(arqNonograma, "\n");
+    }
+
+    fclose(arqNonograma);
 }
 
 int main (int argc, char *argv[])
 {
     printf("Bem vindo ao Nonograma!\n\n");
-    printf("Comandos:\n");
-    printf("x <x> <y> - Marca a casa (x, y) com um X\n");
-    printf("- <x> <y> - Marca a casa (x, y) com um -\n");
-    printf(". <x> <y> - Marca a casa (x, y) com um .\n");
-    printf("resolver  - Resolve o nonograma\n");
-    printf("salvar    - Salva o nonograma\n");
-    printf("sair      - Sai do programa\n\n\n");
+    printaComandos();
 
     //? Criação de variáveis
     char path[260];
@@ -132,6 +180,7 @@ int main (int argc, char *argv[])
     int continuar = 1;
     char** mat;
     char input[10];
+    int recado = 0; //? 0 -> sem recado, 1 -> recado de comando inválido, 2 -> recado de coordenada inválida, 3 -> recado lista de comandos
 
     //? Leitura de arquivo
     FILE *arqNonograma = fopen(path, "r");
@@ -174,8 +223,6 @@ int main (int argc, char *argv[])
     }
 
     //? Ler e alocar matriz nonograma
-
-
     mat = alocMat(matSize.y, matSize.x, sizeof(char));
     for (int i = 0; i < matSize.y; i++)
     {
@@ -198,16 +245,41 @@ int main (int argc, char *argv[])
     //! Código a ser executado em loop
     while (continuar)
     {
-        int x, y;
+        char cordenadas[3] = {0, 0};
+
+        //Recado a ser dado ao jogador entre um resultado e outro
+        switch (recado)
+
+        {
+        case 1:
+            printf("Comando inválido, digite novamente\n");
+            break;
+        
+        case 2:
+            printf("Coordenada inválida, digite novamente\n");
+            break;
+        
+        case 3:
+            printaComandos();
+            break;
+        
+        default:
+            break;
+        }
         printaNonograma(mat, matSize, maxOffset, xCabeçalho, yCabeçalho);
+        
         printf("\nDigite um comando: ");
         scanf("%s", input);
+        fflush(stdin);
 
+        recado = 0;
         switch (interpretaInput(input))
         {
         case 'v':
-            scanf("%d %d", &x, &y);
-            alteraNonograma(mat, matSize, (coord){x, y}, input[0]);
+            scanf("%s", cordenadas);
+            char x = cordenadas[0];
+            char y = cordenadas[1];
+            recado = alteraNonograma(mat, matSize, (coord){ letra2int(x), letra2int(y) }, input[0]);
             break;
 
         case 'r':
@@ -215,33 +287,23 @@ int main (int argc, char *argv[])
             break;
 
         case 'q':
-            printf("Sair\n");
             continuar = 0;
             break;
 
         case 's':
-            printf("Salvar\n");
+            salvaArquivo(path, mat, matSize, xCabeçalho, yCabeçalho);
             break;
         
         case 'c':
-            printf("Comandos:\n");
-            printf("x <x> <y> - Marca a casa (x, y) com um X\n");
-            printf("- <x> <y> - Marca a casa (x, y) com um -\n");
-            printf(". <x> <y> - Marca a casa (x, y) com um .\n");
-            printf("resolver  - Resolve o nonograma\n");
-            printf("salvar    - Salva o nonograma\n\n");
-            printf("sair      - Sai do programa\n");
+            recado = 3;
             break;
 
         default:
-            printf("Comando inválido!\n");
+            recado = 1;
             break;
 
         }
-        printaChar(19, '\n');
     }
-
-
 
     //? Liberação de memória
     for (int i = 0; i < matSize.y; i++)
@@ -249,18 +311,19 @@ int main (int argc, char *argv[])
         free(mat[i]);
     }
     free(mat);
+
     for (int i = 0; i < matSize.y; i++)
     {
         free(xCabeçalho[i]);
     }
     free(xCabeçalho);
+
     for (int i = 0; i < matSize.x; i++)
     {
         free(yCabeçalho[i]);
     }
     free(yCabeçalho);
+
     fclose(arqNonograma);
-
-
     return 0;
 }
