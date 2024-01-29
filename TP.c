@@ -128,6 +128,16 @@ int alteraNonograma(char **mat, coord matSize, coord pos, char c)
 void salvaArquivo(char *path, char **mat, coord matSize, int **xCabeçalho, int **yCabeçalho)
 {
     FILE *arqNonograma = fopen(path, "w");
+    
+    if (arqNonograma == NULL) 
+    {
+        arqNonograma = fopen(path, "a");
+        if (arqNonograma == NULL) 
+        {
+            printf("Erro ao criar o arquivo.\n");
+            return;
+        }
+    }
 
     fprintf(arqNonograma, "%d %d\n", matSize.y, matSize.x);
 
@@ -291,7 +301,9 @@ int main (int argc, char *argv[])
             break;
 
         case 's':
-            salvaArquivo(path, mat, matSize, xCabeçalho, yCabeçalho);
+            char pathCaminho[260];
+            scanf("%s", pathCaminho);
+            salvaArquivo(pathCaminho, mat, matSize, xCabeçalho, yCabeçalho);
             break;
         
         case 'c':
