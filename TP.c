@@ -377,8 +377,8 @@ int main (int argc, char *argv[])
         {
         case 'v':
             scanf("%s", cordenadas);
-            int x = letra2int(cordenadas[0]);
-            int y = letra2int(cordenadas[1]);
+            int y = letra2int(cordenadas[0]);
+            int x = letra2int(cordenadas[1]);
             char buffer;
             recado = alteraNonograma(mat, matSize, (coord){ x, y }, input[0], &buffer);
 
