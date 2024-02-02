@@ -3,6 +3,9 @@
 #include <string.h>
 //#include <stdio_ext.h>
 
+#define true 1
+#define false 0
+
 typedef struct
 {
     int x;
@@ -261,11 +264,93 @@ int comparaVetMat_Cabecalho(char* vetMat, int tamVetMat, int* vetCabecalhoGabari
     return flag;
 }
 
+char * getMatVet(char **mat, coord matSize, int isCol, int index)
+{
+    char *vet = malloc((isCol ? matSize.y : matSize.x) * sizeof(char));
+
+    for (int i = 0; i < (isCol ? matSize.y : matSize.x); i++)
+    {
+        vet[i] = isCol ? mat[i][index] : mat[index][i];
+    }
+
+    return vet;
+}
+
+int checaVitoria(char **mat, coord matSize, int **xCabecalho, int **yCabecalho)
+{
+    char *aux = NULL;
+    int resolvido = 1;
+
+    for (int i = 0; i < matSize.y; i++)
+    {
+        aux = getMatVet(mat, matSize, false, i);
+        if (comparaVetMat_Cabecalho(mat[i], matSize.x, xCabecalho[i]) != 0)
+        {
+            printf("Erro na linha %d\n", i);
+            resolvido = 0;
+            break;
+        }
+        free(aux);
+    }
+
+    if (resolvido)
+    {
+        for (int i = 0; i < matSize.x; i++)
+        {
+            aux = getMatVet(mat, matSize, true, i);
+            if (comparaVetMat_Cabecalho(aux, matSize.y, yCabecalho[i]) != 0)
+            {
+                //print aux
+                printf("Erro na coluna %d\n", i);
+                for (int j = 0; j < matSize.y; j++)
+                { 
+                    printf("%c", aux[j]);
+                }
+                printf("\n");
+                
+                //print cabecalho y
+                for (int j = 0; j < yCabecalho[i][0]; j++)
+                {
+                    printf("%d ", yCabecalho[i][j+1]);
+                }
+                printf("\n");
+                
+                free(aux);
+                resolvido = 0;
+                break;
+            }
+            free(aux);
+        }
+    }
+
+    return resolvido;
+}
+
+int checaJogada(char **mat, coord matSize, int **xCabecalho, int **yCabecalho, coord pos, char c)
+{
+    char* aux = getMatVet(mat, matSize, false, pos.y);
+    if (comparaVetMat_Cabecalho(mat[pos.y], matSize.x, xCabecalho[pos.y]) == 2)
+    {
+        free(aux);
+        return 4;
+    }
+    free(aux);
+
+    aux = getMatVet(mat, matSize, true, pos.x);
+    if (comparaVetMat_Cabecalho(aux, matSize.y, yCabecalho[pos.x]) == 2)
+    {
+        free(aux);
+        return 4;
+    }
+    free(aux);
+
+    return 0;
+}
 
 int main (int argc, char *argv[])
 {
-    printf("Bem vindo ao Nonograma!\n\n");
-    printaComandos();
+    // printf("Bem vindo ao Nonograma!\n\n");
+    // printaComandos();
 
     //? Criacao de variaveis
     char path[260];
@@ -369,34 +454,45 @@ int main (int argc, char *argv[])
         printaNonograma(mat, matSize, maxOffset, xCabecalho, yCabecalho);
         
         printf("\nDigite um comando: ");
+        
+        fflush(stdin);
         scanf("%s", input);
-        //fflush(stdin);
+        fflush(stdin);
 
         recado = 0;
         switch (interpretaInput(input))
         {
         case 'v':
+            fflush(stdin);
             scanf("%s", cordenadas);
+            fflush(stdin);
+
             int y = letra2int(cordenadas[0]);
             int x = letra2int(cordenadas[1]);
             char buffer;
             recado = alteraNonograma(mat, matSize, (coord){ x, y }, input[0], &buffer);
 
-            //Checa se a alteracao eh valida
-
-            if (recado != 2) 
+            //*Checa se a jogada inflige regra
+            if (recado == 0)//Se nao tiver erros
             {
-                printf("%d", x);
-                if (comparaVetMat_Cabecalho(mat[y], matSize.x, xCabecalho[y]) == 2)
+                recado = checaJogada(mat, matSize, xCabecalho, yCabecalho, (coord){ x, y }, input[0]);
+
+                if (recado == 4)//Se a jogada tiver infligido regra
                 {
-                    recado = 4;
                     //desfaz a alteracao
                     alteraNonograma(mat, matSize, (coord){ x, y }, buffer, &buffer);
                 }
             }
-            //TODO: FAZER O MESMO PARA A COLUNA E DEPOIS CHECAR SE O NONOGRAMA FOI RESOLVIDO
-            
-            //checa se o nonograma foi resolvido
+
+            //*checa se o nonograma foi resolvido
+            if (recado == 0)//Se nao tiver erros
+            {
+                if (checaVitoria(mat, matSize, xCabecalho, yCabecalho))
+                {
+                    printf("Parabens, voce resolveu o nonograma!\n");
+                    continuar = 0;
+                }
+            }
 
             break;
 
@@ -411,6 +507,7 @@ int main (int argc, char *argv[])
         case 's':
             scanf("%s", pathCaminho);
             salvaArquivo(pathCaminho, mat, matSize, xCabecalho, yCabecalho);
+            printf("Nonograma salvo com sucesso!\n");
             break;
         
         case 'c':
