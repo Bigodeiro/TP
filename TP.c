@@ -12,6 +12,11 @@ typedef struct
     int y;
 } coord;
 
+void beep()
+{
+    printf("\a");
+}
+
 // 0 -> A, 1 -> B, ...
 char int2letra(int n) 
 {
@@ -489,6 +494,7 @@ int main (int argc, char *argv[])
             {
                 if (checaVitoria(mat, matSize, xCabecalho, yCabecalho))
                 {
+                    beep(); //:)
                     printf("Parabens, voce resolveu o nonograma!\n");
                     continuar = 0;
                 }
