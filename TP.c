@@ -38,12 +38,12 @@ int letra2int(char c)
 void printaComandos ()
 {
     printf("Comandos:\n");
-    printf("x <x><y> - Marca a casa (x, y) com um X\n");
-    printf("- <x><y> - Marca a casa (x, y) com um -\n");
-    printf(". <x><y> - Marca a casa (x, y) com um .\n");
-    printf("resolver  - Resolve o nonograma\n");
-    printf("salvar    - Salva o nonograma\n\n");
-    printf("sair      - Sai do programa\n");
+    printf("x <x><y>          - Marca a casa (x, y) com um X\n");
+    printf("- <x><y>          - Marca a casa (x, y) com um -\n");
+    printf(". <x><y>          - Marca a casa (x, y) com um .\n");
+    printf("resolver          - Resolve o nonograma\n");
+    printf("salvar <nome.txt> - Salva o nonograma\n\n");
+    printf("sair              - Sai do programa\n");
 }
 
 void printaChar(int n, char c)
@@ -235,6 +235,34 @@ int comparaVetMat_Cabecalho(char* vetMat, int tamVetMat, int* vetCabecalhoGabari
     {
         free(vetCabecalhoMat);
         return 2;
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
+        //TODO: DESENVOLVER
     }else if (vetCabecalhoMat[0] < vetCabecalhoGabarito[0])  //Se o tamanho do cabecalho da matriz for menor que o do cabecalho do gabarito deve ser analisado com calma
     {
         //Esse eh um caso em que o tamanho dos cabecalhos sao diferentes mas ainda esta apenas parcialmente preenchido, portanto nao eh erro
@@ -293,6 +321,7 @@ int checaVitoria(char **mat, coord matSize, int **xCabecalho, int **yCabecalho)
         {
             printf("Erro na linha %d\n", i);
             resolvido = 0;
+            free(aux);
             break;
         }
         free(aux);
@@ -496,7 +525,10 @@ int main (int argc, char *argv[])
                 {
                     beep(); //:)
                     printf("Parabens, voce resolveu o nonograma!\n");
-                    continuar = 0;
+                    printf("\nDeseja jogar continuar? (s/n): ");
+                    char continuarChar;
+                    scanf("%c", &continuarChar);
+                    if (continuarChar == 'n' || continuarChar == 'N') continuar = 0;
                 }
             }
 
