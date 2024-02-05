@@ -65,19 +65,19 @@ void* alocMat(int y, int x, int typeSize)
     return mat;
 }
 
-void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabecalho, int **yCabecalho)
+void printaNonograma(char **mat, coord tamMat, coord espacamentoMax, int **xCabecalho, int **yCabecalho)
 {
     //LogicaPrintaNonograma.png
     //!Parte 1
-    for (int i = 0; i < maxOffset.y; i++)
+    for (int i = 0; i < espacamentoMax.y; i++)
     {
-        printaChar((maxOffset.x * 3) + 1, ' ');
+        printaChar((espacamentoMax.x * 3) + 1, ' ');
 
-        for (int j = 0; j < matSize.x; j++)
+        for (int j = 0; j < tamMat.x; j++)
         {
-            if (yCabecalho[j][0] > maxOffset.y - i - 1)
+            if (yCabecalho[j][0] > espacamentoMax.y - i - 1)
             {
-                printf("%2d", yCabecalho[j][yCabecalho[j][0] - maxOffset.y + i + 1]);
+                printf("%2d", yCabecalho[j][yCabecalho[j][0] - espacamentoMax.y + i + 1]);
             }else printaChar(2, ' ');
 
             printaChar(1, ' ');
@@ -86,9 +86,9 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabecalh
     }
 
     //!Parte 2
-    printaChar((maxOffset.x * 3) + 2, ' ');
+    printaChar((espacamentoMax.x * 3) + 2, ' ');
 
-    for (int i = 0; i < matSize.x; i++)
+    for (int i = 0; i < tamMat.x; i++)
     {
         printaChar(1, int2letra(i));
         printaChar(2, ' ');
@@ -97,9 +97,9 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabecalh
     printf("\n");
 
     //!Parte 3
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < tamMat.y; i++)
     {
-        printaChar((maxOffset.x - xCabecalho[i][0]) * 3, ' ');
+        printaChar((espacamentoMax.x - xCabecalho[i][0]) * 3, ' ');
 
         for (int j = 0; j < xCabecalho[i][0]; j++)
         {
@@ -109,7 +109,7 @@ void printaNonograma(char **mat, coord matSize, coord maxOffset, int **xCabecalh
 
         printaChar(1, int2letra(i));
         
-        for (int j = 0; j < matSize.x; j++)
+        for (int j = 0; j < tamMat.x; j++)
         {
             
             printf(" %c ", mat[i][j]);
@@ -131,9 +131,9 @@ char interpretaInput(char *str)
     return -1;
 }
 
-int alteraNonograma(char **mat, coord matSize, coord pos, char c, char *buffer)
+int alteraNonograma(char **mat, coord tamMat, coord pos, char c, char *buffer)
 {
-    if (pos.x < 0 || pos.x >= matSize.x || pos.y < 0 || pos.y >= matSize.y) {
+    if (pos.x < 0 || pos.x >= tamMat.x || pos.y < 0 || pos.y >= tamMat.y) {
         return 2;
     }
 
@@ -142,7 +142,7 @@ int alteraNonograma(char **mat, coord matSize, coord pos, char c, char *buffer)
     return 0;
 }
 
-void salvaArquivo(char *path, char **mat, coord matSize, int **xCabecalho, int **yCabecalho)
+void salvaArquivo(char *path, char **mat, coord tamMat, int **xCabecalho, int **yCabecalho)
 {
     FILE *arqNonograma = fopen(path, "w");
     
@@ -156,9 +156,9 @@ void salvaArquivo(char *path, char **mat, coord matSize, int **xCabecalho, int *
         }
     }
 
-    fprintf(arqNonograma, "%d %d\n", matSize.y, matSize.x);
+    fprintf(arqNonograma, "%d %d\n", tamMat.y, tamMat.x);
 
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < tamMat.y; i++)
     {
         fprintf(arqNonograma, "%d ", xCabecalho[i][0]);
 
@@ -169,7 +169,7 @@ void salvaArquivo(char *path, char **mat, coord matSize, int **xCabecalho, int *
         fprintf(arqNonograma, "\n");
     }
 
-    for (int i = 0; i < matSize.x; i++)
+    for (int i = 0; i < tamMat.x; i++)
     {
         fprintf(arqNonograma, "%d ", yCabecalho[i][0]);
 
@@ -180,9 +180,9 @@ void salvaArquivo(char *path, char **mat, coord matSize, int **xCabecalho, int *
         fprintf(arqNonograma, "\n");
     }
 
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < tamMat.y; i++)
     {
-        for (int j = 0; j < matSize.x; j++)
+        for (int j = 0; j < tamMat.x; j++)
         {
             fprintf(arqNonograma, "%c", mat[i][j]);
         }
@@ -195,14 +195,13 @@ void salvaArquivo(char *path, char **mat, coord matSize, int **xCabecalho, int *
 int comparaVetMat_Cabecalho(char* vetMat, int tamVetMat, int* vetCabecalhoGabarito)
 {
     //retorna 0 se igual, 1 se ainda esta sendo preenchido, 2 se erro
-    // Cria o vetor que sera comparado com o cabecalho gabarito
+
     int* vetCabecalhoMat = malloc((tamVetMat + 1) * sizeof(int));
 
     int flag = 0;
     int count = 0;
     int index = 1;
 
-    //Essa variavel guarda o maior elemento do cabecalho do gabarito
     int maiorElemGabarito = 0;
     for (int i = 1; i <= vetCabecalhoGabarito[0]; i++) 
     {
@@ -230,40 +229,34 @@ int comparaVetMat_Cabecalho(char* vetMat, int tamVetMat, int* vetCabecalhoGabari
     }
     vetCabecalhoMat[0] = index - 1;
 
-    // Se o tamanho do cabecalho da matriz for maior que o do cabecalho do gabarito retorna 2 (erro)
+    //!Caso 1
     if (vetCabecalhoMat[0] > vetCabecalhoGabarito[0]) 
     {
-        free(vetCabecalhoMat);
-        return 2;
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-        //TODO: DESENVOLVER
-    }else if (vetCabecalhoMat[0] < vetCabecalhoGabarito[0])  //Se o tamanho do cabecalho da matriz for menor que o do cabecalho do gabarito deve ser analisado com calma
+        int nGruposVerdadeiro = 0;
+        //? Calculando o numero real de possiveis grupos ex: considera-se "x-x" um grupo so quando o cabeçalho tem um 3
+        for (int i = 0; i < tamVetMat; i++)
+        {
+            if (vetMat[i] == 'x')
+            {
+                nGruposVerdadeiro++;
+                i += (vetCabecalhoGabarito[nGruposVerdadeiro] - 1);
+            }
+        }
+
+        printf("N real de grupos: %d\n", nGruposVerdadeiro);
+
+        if (nGruposVerdadeiro > vetCabecalhoGabarito[0])
+        {
+            printf("chego");
+            free(vetCabecalhoMat);
+            return 2;
+        }else
+        {
+            return 1;
+        }
+    }
+    //!Caso 2   
+    else if (vetCabecalhoMat[0] < vetCabecalhoGabarito[0])  //Se o tamanho do cabecalho da matriz for menor que o do cabecalho do gabarito deve ser analisado com calma
     {
         //Esse eh um caso em que o tamanho dos cabecalhos sao diferentes mas ainda esta apenas parcialmente preenchido, portanto nao eh erro
         for (int i = 1; i <= vetCabecalhoMat[0]; i++) 
@@ -282,7 +275,7 @@ int comparaVetMat_Cabecalho(char* vetMat, int tamVetMat, int* vetCabecalhoGabari
     }
 
     // Caso o programa chegue aqui, os tamanhos dos cabecalhos sao iguais, oque significa que so resta comparar os elementos
-    // Compare each element of the vectors
+    //!Caso 3
     for (int i = 1; i <= vetCabecalhoMat[0]; i++) 
     {
         if (vetCabecalhoMat[i] > vetCabecalhoGabarito[i]) 
@@ -297,11 +290,11 @@ int comparaVetMat_Cabecalho(char* vetMat, int tamVetMat, int* vetCabecalhoGabari
     return flag;
 }
 
-char * getMatVet(char **mat, coord matSize, int isCol, int index)
+char * getMatVet(char **mat, coord tamMat, int isCol, int index)
 {
-    char *vet = malloc((isCol ? matSize.y : matSize.x) * sizeof(char));
+    char *vet = malloc((isCol ? tamMat.y : tamMat.x) * sizeof(char));
 
-    for (int i = 0; i < (isCol ? matSize.y : matSize.x); i++)
+    for (int i = 0; i < (isCol ? tamMat.y : tamMat.x); i++)
     {
         vet[i] = isCol ? mat[i][index] : mat[index][i];
     }
@@ -309,17 +302,16 @@ char * getMatVet(char **mat, coord matSize, int isCol, int index)
     return vet;
 }
 
-int checaVitoria(char **mat, coord matSize, int **xCabecalho, int **yCabecalho)
+int checaVitoria(char **mat, coord tamMat, int **xCabecalho, int **yCabecalho)
 {
     char *aux = NULL;
     int resolvido = 1;
 
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < tamMat.y; i++)
     {
-        aux = getMatVet(mat, matSize, false, i);
-        if (comparaVetMat_Cabecalho(mat[i], matSize.x, xCabecalho[i]) != 0)
+        aux = getMatVet(mat, tamMat, false, i);
+        if (comparaVetMat_Cabecalho(mat[i], tamMat.x, xCabecalho[i]) != 0)
         {
-            printf("Erro na linha %d\n", i);
             resolvido = 0;
             free(aux);
             break;
@@ -329,14 +321,14 @@ int checaVitoria(char **mat, coord matSize, int **xCabecalho, int **yCabecalho)
 
     if (resolvido)
     {
-        for (int i = 0; i < matSize.x; i++)
+        for (int i = 0; i < tamMat.x; i++)
         {
-            aux = getMatVet(mat, matSize, true, i);
-            if (comparaVetMat_Cabecalho(aux, matSize.y, yCabecalho[i]) != 0)
+            aux = getMatVet(mat, tamMat, true, i);
+            if (comparaVetMat_Cabecalho(aux, tamMat.y, yCabecalho[i]) != 0)
             {
                 //print aux
                 printf("Erro na coluna %d\n", i);
-                for (int j = 0; j < matSize.y; j++)
+                for (int j = 0; j < tamMat.y; j++)
                 { 
                     printf("%c", aux[j]);
                 }
@@ -360,18 +352,18 @@ int checaVitoria(char **mat, coord matSize, int **xCabecalho, int **yCabecalho)
     return resolvido;
 }
 
-int checaJogada(char **mat, coord matSize, int **xCabecalho, int **yCabecalho, coord pos, char c)
+int checaJogada(char **mat, coord tamMat, int **xCabecalho, int **yCabecalho, coord pos, char c)
 {
-    char* aux = getMatVet(mat, matSize, false, pos.y);
-    if (comparaVetMat_Cabecalho(mat[pos.y], matSize.x, xCabecalho[pos.y]) == 2)
+    char* aux = getMatVet(mat, tamMat, false, pos.y);
+    if (comparaVetMat_Cabecalho(mat[pos.y], tamMat.x, xCabecalho[pos.y]) == 2)
     {
         free(aux);
         return 4;
     }
     free(aux);
 
-    aux = getMatVet(mat, matSize, true, pos.x);
-    if (comparaVetMat_Cabecalho(aux, matSize.y, yCabecalho[pos.x]) == 2)
+    aux = getMatVet(mat, tamMat, true, pos.x);
+    if (comparaVetMat_Cabecalho(aux, tamMat.y, yCabecalho[pos.x]) == 2)
     {
         free(aux);
         return 4;
@@ -383,14 +375,12 @@ int checaJogada(char **mat, coord matSize, int **xCabecalho, int **yCabecalho, c
 
 int main (int argc, char *argv[])
 {
-    // printf("Bem vindo ao Nonograma!\n\n");
-    // printaComandos();
-
     //? Criacao de variaveis
+    int boasVindasFlag = 1;
     char path[260];
     strcpy(path, argv[1]);
-    coord maxOffset = {0, 0};
-    coord matSize;
+    coord espacamentoMax = {0, 0};
+    coord tamMat;
     int **xCabecalho;
     int **yCabecalho;
     int continuar = 1;
@@ -400,14 +390,14 @@ int main (int argc, char *argv[])
 
     //? Leitura de arquivo
     FILE *arqNonograma = fopen(path, "r");
-    fscanf(arqNonograma, "%d %d", &matSize.y, &matSize.x);
+    fscanf(arqNonograma, "%d %d", &tamMat.y, &tamMat.x);
 
     //? Alocacao dos cabecalhos
-    xCabecalho = malloc(matSize.y * sizeof(int*));
-    yCabecalho = malloc(matSize.x * sizeof(int*));
+    xCabecalho = malloc(tamMat.y * sizeof(int*));
+    yCabecalho = malloc(tamMat.x * sizeof(int*));
 
     //? Ler cabecalho x
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < tamMat.y; i++)
     {
         int aux;
         fscanf(arqNonograma, "%d", &aux);
@@ -419,11 +409,11 @@ int main (int argc, char *argv[])
             fscanf(arqNonograma, "%d", &xCabecalho[i][j+1]);
         }
 
-        maxOffset.x = aux > maxOffset.x ? aux : maxOffset.x;
+        espacamentoMax.x = aux > espacamentoMax.x ? aux : espacamentoMax.x;
     }
 
     //? Ler cabecalho y
-    for (int i = 0; i < matSize.x; i++)
+    for (int i = 0; i < tamMat.x; i++)
     {
         int aux;
         fscanf(arqNonograma, "%d", &aux);
@@ -435,14 +425,14 @@ int main (int argc, char *argv[])
             fscanf(arqNonograma, "%d", &yCabecalho[i][j+1]);
         }
 
-        maxOffset.y = aux > maxOffset.y ? aux : maxOffset.y;
+        espacamentoMax.y = aux > espacamentoMax.y ? aux : espacamentoMax.y;
     }
 
     //? Ler e alocar matriz nonograma
-    mat = alocMat(matSize.y, matSize.x, sizeof(char));
-    for (int i = 0; i < matSize.y; i++)
+    mat = alocMat(tamMat.y, tamMat.x, sizeof(char));
+    for (int i = 0; i < tamMat.y; i++)
     {
-        for (int j = 0; j < matSize.x; j++)
+        for (int j = 0; j < tamMat.x; j++)
         {
             char aux;
 
@@ -461,9 +451,16 @@ int main (int argc, char *argv[])
     //! Codigo a ser executado em loop
     while (continuar)
     {
-        char cordenadas[3] = {0, 0};
+        char cordenadas[260] = {0, 0};
         char pathCaminho[260];
 
+        if (boasVindasFlag)
+        {
+            printaChar(20, '\n');
+            printf("Bem vindo ao Nonograma!");
+            printaComandos();
+            boasVindasFlag = 0;
+        }else printaChar(20, '\n');
         //Recado a ser dado ao jogador entre um resultado e outro
         switch (recado)
         {
@@ -485,7 +482,7 @@ int main (int argc, char *argv[])
         default:
             break;
         }
-        printaNonograma(mat, matSize, maxOffset, xCabecalho, yCabecalho);
+        printaNonograma(mat, tamMat, espacamentoMax, xCabecalho, yCabecalho);
         
         printf("\nDigite um comando: ");
         
@@ -501,27 +498,38 @@ int main (int argc, char *argv[])
             scanf("%s", cordenadas);
             fflush(stdin);
 
+            printf("tam input: %d\n", strlen(cordenadas));
+
+            if (strlen(cordenadas) > 2)
+            {
+                recado = 1;
+            }            
+
             int y = letra2int(cordenadas[0]);
             int x = letra2int(cordenadas[1]);
             char buffer;
-            recado = alteraNonograma(mat, matSize, (coord){ x, y }, input[0], &buffer);
 
+            if (recado == 0)
+            {
+                recado = alteraNonograma(mat, tamMat, (coord){ x, y }, input[0], &buffer);
+            }
+        
             //*Checa se a jogada inflige regra
             if (recado == 0)//Se nao tiver erros
             {
-                recado = checaJogada(mat, matSize, xCabecalho, yCabecalho, (coord){ x, y }, input[0]);
+                recado = checaJogada(mat, tamMat, xCabecalho, yCabecalho, (coord){ x, y }, input[0]);
 
                 if (recado == 4)//Se a jogada tiver infligido regra
                 {
                     //desfaz a alteracao
-                    alteraNonograma(mat, matSize, (coord){ x, y }, buffer, &buffer);
+                    alteraNonograma(mat, tamMat, (coord){ x, y }, buffer, &buffer);
                 }
             }
 
             //*checa se o nonograma foi resolvido
             if (recado == 0)//Se nao tiver erros
             {
-                if (checaVitoria(mat, matSize, xCabecalho, yCabecalho))
+                if (checaVitoria(mat, tamMat, xCabecalho, yCabecalho))
                 {
                     beep(); //:)
                     printf("Parabens, voce resolveu o nonograma!\n");
@@ -544,7 +552,7 @@ int main (int argc, char *argv[])
 
         case 's':
             scanf("%s", pathCaminho);
-            salvaArquivo(pathCaminho, mat, matSize, xCabecalho, yCabecalho);
+            salvaArquivo(pathCaminho, mat, tamMat, xCabecalho, yCabecalho);
             printf("Nonograma salvo com sucesso!\n");
             break;
         
@@ -560,19 +568,19 @@ int main (int argc, char *argv[])
     }
 
     //? Liberacao de memoria
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < tamMat.y; i++)
     {
         free(mat[i]);
     }
     free(mat);
 
-    for (int i = 0; i < matSize.y; i++)
+    for (int i = 0; i < tamMat.y; i++)
     {
         free(xCabecalho[i]);
     }
     free(xCabecalho);
 
-    for (int i = 0; i < matSize.x; i++)
+    for (int i = 0; i < tamMat.x; i++)
     {
         free(yCabecalho[i]);
     }
