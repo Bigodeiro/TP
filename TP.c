@@ -493,125 +493,122 @@ int main (int argc, char *argv[])
         }
     }
 
-    resolverNonograma(mat, tamMat, linCabecalho, colCabecalho);
-    printaNonograma(mat, tamMat, espacamentoMax, linCabecalho, colCabecalho);
+    //! Codigo a ser executado em loop
+    while (continuar)
+    {
+        char cordenadas[260] = {0, 0};
+        char strCaminho[260];
 
-    // //! Codigo a ser executado em loop
-    // while (continuar)
-    // {
-    //     char cordenadas[260] = {0, 0};
-    //     char strCaminho[260];
-
-    //     if (boasVindasFlag)
-    //     {
-    //         printaChar(20, '\n');
-    //         printf("Bem vindo ao Nonograma!");
-    //         printaComandos();
-    //         boasVindasFlag = 0;
-    //     }else printaChar(20, '\n');
-    //     //Recado a ser dado ao jogador entre um resultado e outro
-    //     switch (recado)
-    //     {
-    //     case 1:
-    //         printf("Comando invalido, digite novamente\n");
-    //         break;
+        if (boasVindasFlag)
+        {
+            printaChar(20, '\n');
+            printf("Bem vindo ao Nonograma!");
+            printaComandos();
+            boasVindasFlag = 0;
+        }else printaChar(20, '\n');
+        //Recado a ser dado ao jogador entre um resultado e outro
+        switch (recado)
+        {
+        case 1:
+            printf("Comando invalido, digite novamente\n");
+            break;
         
-    //     case 2:
-    //         printf("Coordenada invalida, digite novamente\n");
-    //         break;
+        case 2:
+            printf("Coordenada invalida, digite novamente\n");
+            break;
         
-    //     case 3:
-    //         printaComandos();
-    //         break;
-    //     case 4:
-    //         printf("Você infligiu as regras do nonograma, portanto o ultimo movimento foi desfeito\n");
-    //         break;
-    //     case 5:
-    //         printf("Nonograma resolvido! (ou quase isso)\n");
-    //         break;
+        case 3:
+            printaComandos();
+            break;
+        case 4:
+            printf("Você infligiu as regras do nonograma, portanto o ultimo movimento foi desfeito\n");
+            break;
+        case 5:
+            printf("Nonograma resolvido! (ou quase isso)\n");
+            break;
         
-    //     default:
-    //         break;
-    //     }
-    //     printaNonograma(mat, tamMat, espacamentoMax, linCabecalho, colCabecalho);
+        default:
+            break;
+        }
+        printaNonograma(mat, tamMat, espacamentoMax, linCabecalho, colCabecalho);
         
-    //     printf("\nDigite um comando: ");
+        printf("\nDigite um comando: ");
         
-    //     fflush(stdin);
-    //     scanf("%s", input);
-    //     fflush(stdin);
+        fflush(stdin);
+        scanf("%s", input);
+        fflush(stdin);
 
-    //     recado = 0;
-    //     switch (interpretaInput(input))
-    //     {
-    //     case 'v':
-    //         fflush(stdin);
-    //         scanf("%s", cordenadas);
-    //         fflush(stdin);
+        recado = 0;
+        switch (interpretaInput(input))
+        {
+        case 'v':
+            fflush(stdin);
+            scanf("%s", cordenadas);
+            fflush(stdin);
 
-    //         if (strlen(cordenadas) > 2)
-    //         {
-    //             recado = 1;
-    //         }            
+            if (strlen(cordenadas) > 2)
+            {
+                recado = 1;
+            }            
 
-    //         int y = letra2int(cordenadas[0]);
-    //         int x = letra2int(cordenadas[1]);
-    //         char buffer;
+            int y = letra2int(cordenadas[0]);
+            int x = letra2int(cordenadas[1]);
+            char buffer;
 
-    //         if (recado == 0)
-    //         {
-    //             recado = alteraNonograma(mat, tamMat, (coord){ x, y }, input[0], &buffer);
-    //         }
+            if (recado == 0)
+            {
+                recado = alteraNonograma(mat, tamMat, (coord){ x, y }, input[0], &buffer);
+            }
         
-    //         //*Checa se a jogada inflige regra
-    //         if (recado == 0)//Se nao tiver erros
-    //         {
-    //             recado = checaJogada(mat, tamMat, linCabecalho, colCabecalho, (coord){ x, y }, input[0]);
+            //*Checa se a jogada inflige regra
+            if (recado == 0)//Se nao tiver erros
+            {
+                recado = checaJogada(mat, tamMat, linCabecalho, colCabecalho, (coord){ x, y }, input[0]);
 
-    //             if (recado == 4)//Se a jogada tiver infligido regra
-    //             {
-    //                 //desfaz a alteracao
-    //                 alteraNonograma(mat, tamMat, (coord){ x, y }, buffer, &buffer);
-    //             }
-    //         }
+                if (recado == 4)//Se a jogada tiver infligido regra
+                {
+                    //desfaz a alteracao
+                    alteraNonograma(mat, tamMat, (coord){ x, y }, buffer, &buffer);
+                }
+            }
 
-    //         //*checa se o nonograma foi resolvido
-    //         if (recado == 0)//Se nao tiver erros
-    //         {
-    //             if (checaVitoria(mat, tamMat, linCabecalho, colCabecalho))
-    //             {
-    //                 beep(); //:)
-    //                 printf("Parabens, voce resolveu o nonograma!\n");
-    //             }
-    //         }
+            //*checa se o nonograma foi resolvido
+            if (recado == 0)//Se nao tiver erros
+            {
+                if (checaVitoria(mat, tamMat, linCabecalho, colCabecalho))
+                {
+                    beep(); //:)
+                    printf("Parabens, voce resolveu o nonograma!\n");
+                }
+            }
 
-    //         break;
+            break;
 
-    //     case 'r':
-    //         resolverNonograma(mat, tamMat, linCabecalho, colCabecalho);
-    //         recado = 5;
-    //         break;
+        case 'r':
+            resolverNonograma(mat, tamMat, linCabecalho, colCabecalho);
+            recado = 5;
+            break;
 
-    //     case 'q':
-    //         continuar = 0;
-    //         break;
+        case 'q':
+            continuar = 0;
+            break;
 
-    //     case 's':
-    //         scanf("%s", strCaminho);
-    //         salvaArquivo(strCaminho, mat, tamMat, linCabecalho, colCabecalho);
-    //         printf("Nonograma salvo com sucesso!\n");
-    //         break;
+        case 's':
+            scanf("%s", strCaminho);
+            salvaArquivo(strCaminho, mat, tamMat, linCabecalho, colCabecalho);
+            printf("Nonograma salvo com sucesso!\n");
+            break;
         
-    //     case 'c':
-    //         recado = 3;
-    //         break;
+        case 'c':
+            recado = 3;
+            break;
 
-    //     default:
-    //         recado = 1;
-    //         break;
+        default:
+            recado = 1;
+            break;
 
-    //     }
-    // }
+        }
+    }
 
     //? Liberacao de memoria
     for (int i = 0; i < tamMat.y; i++)
